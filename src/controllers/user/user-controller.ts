@@ -2,12 +2,9 @@ import { UserService } from '../../service/user-service';
 import express, { NextFunction } from 'express';
 import { Inject } from 'typescript-ioc';
 import { LoginResponse, LoginUser, RegisterUser, SuccessResponse } from '../../dtos/user.dto';
-const cookieOptions = {
-    expires: new Date(
-        Date.now() + 30 * 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true
-}
+import { cookieOptions } from '../../utils/CommonFunction';
+
+
 export class UserController {
 
     private userService: UserService;
@@ -16,7 +13,7 @@ export class UserController {
         this.userService = userService;
     }
 
-    public async registerUser(req: express.Request, res: express.Response, next: NextFunction): Promise<any> {
+    public async registerUser(req: express.Request, res: express.Response, next: NextFunction): Promise<void> {
         try {
             console.log("register", req.body);
             const success: SuccessResponse = await this.userService.registerUser(req.body as RegisterUser);
@@ -27,7 +24,7 @@ export class UserController {
         }
     }
 
-    public async loginUser(req: express.Request, res: express.Response, next: NextFunction): Promise<any> {
+    public async loginUser(req: express.Request, res: express.Response, next: NextFunction): Promise<void> {
         try {
             const loginRes: LoginResponse = await this.userService.loginUser(req.body as LoginUser);
             res.status(201).cookie('biketoken', loginRes.accessToken, cookieOptions).json({ ...loginRes, message: "User Login successfully" });
@@ -38,7 +35,7 @@ export class UserController {
     }
 
 
-    public async getAllUsers(req: express.Request, res: express.Response, next: NextFunction): Promise<any> {
+    public async getAllUsers(req: express.Request, res: express.Response, next: NextFunction): Promise<void> {
         try {
             const getAllRes: SuccessResponse = await this.userService.getAllUsers();
             res.status(200).json({ ...getAllRes, message: "User Login successfully" });
@@ -48,7 +45,7 @@ export class UserController {
         }
     }
 
-    public async deleteUser(req: express.Request, res: express.Response, next: NextFunction): Promise<any> {
+    public async deleteUser(req: express.Request, res: express.Response, next: NextFunction): Promise<void> {
         try {
             const deleteRes: SuccessResponse = await this.userService.deleteUser(req.params.id as string);
             res.status(200).json({ ...deleteRes, message: "User deleted successfully" });
@@ -59,7 +56,7 @@ export class UserController {
     }
 
 
-    public async getLoggedInUser(req: express.Request, res: express.Response, next: NextFunction): Promise<any> {
+    public async getLoggedInUser(req: express.Request, res: express.Response, next: NextFunction): Promise<void> {
         try {
             const getUserRes: SuccessResponse = await this.userService.getUser(req.cookies.biketoken as string);
             res.status(200).json({ ...getUserRes, message: "User Fetched successfully" });
@@ -72,7 +69,7 @@ export class UserController {
 
 
 
-    public async updateUser(req: express.Request, res: express.Response, next: NextFunction): Promise<any> {
+    public async updateUser(req: express.Request, res: express.Response, next: NextFunction): Promise<void> {
         try {
             const deleteRes: SuccessResponse = await this.userService.deleteUser(req.body as string);
             res.status(200).json({ ...deleteRes, message: "User deleted successfully" });
@@ -81,10 +78,4 @@ export class UserController {
             res.status(error.statusCode).json({ message: error.message })
         }
     }
-
-
-
-
-
-
 }

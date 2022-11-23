@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, BaseEntity ,JoinTable} from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, BaseEntity, JoinTable } from "typeorm"
 import { Bike } from "./bike.entity"
 import { User } from "./user.entity"
 
@@ -33,7 +33,7 @@ export class Reservation extends BaseEntity {
     @Column({ nullable: true })
     userName: string
 
-    @ManyToOne(() => User, (user) => user.reservations, { nullable: true, cascade:true })
+    @ManyToOne(() => User, (user) => user.reservations, { nullable: true, cascade: true, onDelete: 'CASCADE' })
     user: User
 
     @ManyToOne(() => Bike, (bike) => bike.reservations, { nullable: true, onDelete: 'CASCADE' })

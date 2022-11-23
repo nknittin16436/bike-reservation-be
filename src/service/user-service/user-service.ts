@@ -32,7 +32,9 @@ export class UserService {
                 return { user, accessToken: token, success: true };
             }
             throw new ErrorHandler("EMAIL AND PASSWORD DO NOT MATCH", 400);
-        } else {
+        } 
+        
+        else {
             throw new ErrorHandler("No user found with this Email Id", 400);
         }
 
