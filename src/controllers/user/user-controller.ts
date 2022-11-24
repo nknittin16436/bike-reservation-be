@@ -1,7 +1,7 @@
 import { UserService } from '../../service/user-service';
 import express, { NextFunction } from 'express';
 import { Inject } from 'typescript-ioc';
-import { LoginResponse, LoginUser, RegisterUser, SuccessResponse } from '../../dtos/user.dto';
+import { LoginResponse, LoginUser, RegisterUser, SuccessResponse, UpdateUserData } from '../../dtos/user.dto';
 import { cookieOptions } from '../../utils/CommonFunction';
 
 
@@ -71,8 +71,8 @@ export class UserController {
 
     public async updateUser(req: express.Request, res: express.Response, next: NextFunction): Promise<void> {
         try {
-            const deleteRes: SuccessResponse = await this.userService.deleteUser(req.body as string);
-            res.status(200).json({ ...deleteRes, message: "User deleted successfully" });
+            const deleteRes: SuccessResponse = await this.userService.updateUser(req.params.id as string, req.body as UpdateUserData);
+            res.status(200).json({ ...deleteRes, message: "User updated successfully" });
         } catch (error: any) {
             console.log(error);
             res.status(error.statusCode).json({ message: error.message })

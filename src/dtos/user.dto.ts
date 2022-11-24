@@ -12,6 +12,13 @@ export interface LoginUser {
     password: string;
 }
 
+export interface UpdateUserData {
+    name: string;
+    email: string;
+    role: string;
+}
+
+
 export interface SuccessResponse {
     success: boolean;
     users?: User[]
@@ -24,4 +31,4 @@ export interface LoginResponse {
 
 export interface JwtPayload {
     id: string
-  }
+}

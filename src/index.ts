@@ -1,6 +1,6 @@
 import express from 'express';
 const bodyParser = require('body-parser');
-import { userRouter } from './controllers';
+import { bikeRouter, userRouter } from './controllers';
 const cookieParser = require('cookie-parser');
 
 import 'module-alias/register';
@@ -17,7 +17,8 @@ app.use(express.json());
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 
-app.use("/api/v1", userRouter)
+app.use("/api/v1", userRouter);
+app.use("/api/v1", bikeRouter);
 
 
 export default app;

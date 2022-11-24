@@ -1,4 +1,4 @@
-import { JwtPayload, LoginUser, RegisterUser, SuccessResponse } from "../../dtos/user.dto";
+import { JwtPayload, LoginUser, RegisterUser, SuccessResponse, UpdateUserData } from "../../dtos/user.dto";
 import { User } from "../../entities/user.entity";
 import { ErrorHandler } from "../../utils/ErrorHandler";
 import * as bcrypt from 'bcryptjs';
@@ -32,13 +32,11 @@ export class UserService {
                 return { user, accessToken: token, success: true };
             }
             throw new ErrorHandler("EMAIL AND PASSWORD DO NOT MATCH", 400);
-        } 
-        
+        }
+
         else {
             throw new ErrorHandler("No user found with this Email Id", 400);
         }
-
-
     }
     async getAllUsers(): Promise<any> {
         const users: User[] = await User.find({
@@ -68,5 +66,18 @@ export class UserService {
             return { success: true }
         }
         throw new ErrorHandler("Unable to delete or User not Found", 400);
+    }
+
+    async updateUser(id: string, updateUserData: UpdateUserData): Promise<any> {
+        const user: User | null = await User.findOne({ where: { id: id } });
+        if (user) {
+            if (Object.keys(updateUserData).length !== 0) {
+                console.log(updateUserData)
+                await User.update(id, { ...updateUserData });
+            }
+
+            return { success: true }
+        }
+        throw new ErrorHandler("Unable to update or User not Found", 400);
     }
 }
