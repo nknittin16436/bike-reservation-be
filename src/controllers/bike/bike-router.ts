@@ -6,8 +6,18 @@ const router = express.Router();
 
 const bikeController = Container.get(BikeController);
 
-router.post("/", (req, res, next) => {
+router.post("/bikes", (req, res, next) => {
     bikeController.createBike(req, res, next);
+});
+
+router.get("/bikes", (req, res, next) => {
+    bikeController.getBikes(req, res, next);
+});
+router.patch("/bikes/:id", (req, res, next) => {
+    bikeController.updateBike(req, res, next);
+});
+router.delete("/bikes/:id", (req, res, next) => {
+    bikeController.deleteBike(req, res, next);
 });
 
 

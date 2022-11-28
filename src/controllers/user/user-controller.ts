@@ -1,4 +1,4 @@
-import { UserService } from '../../service/user-service';
+import { UserService } from '../../service';
 import express, { NextFunction } from 'express';
 import { Inject } from 'typescript-ioc';
 import { LoginResponse, LoginUser, RegisterUser, SuccessResponse, UpdateUserData } from '../../dtos/user.dto';

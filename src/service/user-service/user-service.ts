@@ -4,7 +4,7 @@ import { ErrorHandler } from "../../utils/ErrorHandler";
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 
-import { isUserRegistered } from "../../utils/CommonFunction";
+import { getLoggedInUser, isUserRegistered } from "../../utils/CommonFunction";
 
 export class UserService {
     async registerUser(userData: RegisterUser): Promise<any> {
@@ -48,9 +48,7 @@ export class UserService {
     }
 
     async getUser(biketoken: string): Promise<any> {
-        const decodedData: JwtPayload = jwt.verify(biketoken, process.env.JWT_SECRET as string) as JwtPayload;
-        console.log(decodedData);
-        const user: User | null = await User.findOne({ where: { id: decodedData.id } });
+        const user: User | null = await getLoggedInUser(biketoken);
         if (user) {
             return { user, success: true };
         }
