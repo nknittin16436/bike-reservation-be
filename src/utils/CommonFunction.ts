@@ -2,6 +2,9 @@ import { JwtPayload } from "jsonwebtoken";
 import { Bike } from "../entities/bike.entity";
 import { User } from "../entities/user.entity";
 import * as jwt from 'jsonwebtoken';
+import { FilterQuery } from "../dtos/bike.dto";
+import moment from 'moment';
+import { ErrorHandler } from "./ErrorHandler";
 
 
 export const cookieOptions = {
@@ -38,6 +41,44 @@ export const getBikeOnBasisOfRole = async (biketoken: string): Promise<Bike[]> =
         if (user.role === "regular") {
             filteredBikes = await Bike.find();
             filteredBikes = filteredBikes.filter((bike) => bike.isAvailable === true)
+        }
+    }
+    return filteredBikes;
+}
+
+
+export const filterBikesByQuery = async (bikes: Bike[], query: FilterQuery): Promise<Bike[]> => {
+    let filteredBikes: Bike[] = [];
+    if (query && query.rating) {
+
+        bikes = bikes.filter(bike => bike.averageRating >= query.rating);
+    }
+    if (query && query.name) {
+        bikes = bikes.filter(bike => bike.name.toLowerCase().includes(query.name.toLowerCase()));
+    }
+    if (query.color) {
+
+        bikes = bikes.filter(bike => bike.color.toLowerCase().includes(query.color.toLowerCase()));
+    }
+    if (query.location) {
+
+        bikes = bikes.filter(bike => bike.location.toLowerCase().includes(query.location.toLowerCase()));
+    }
+    if (query.fromDate || query.toDate) {
+        if (!query.fromDate || !moment(query.fromDate, 'YYYY-MM-DD H:mm:ss').isValid()) {
+            throw new ErrorHandler('Enter valid from date', 400);
+        }
+        if (!query.toDate || !moment(query.toDate, 'YYYY-MM-DD H:mm:ss', true).isValid()) {
+            throw new ErrorHandler('Enter valid to date', 400);
+        }
+        if (!query.fromDate || !query.toDate) {
+            throw new ErrorHandler('Enter valid from and to date', 400);
+        }
+        if (query.fromDate < moment(Date.now()).format('YYYY-MM-DD H:mm:ss')) {
+            throw new ErrorHandler('Start date should be greater then current date', 400);
+        }
+        if (query.fromDate > query.toDate) {
+            throw new ErrorHandler('From date cannot be greater than to date', 400);
         }
     }
     return filteredBikes;

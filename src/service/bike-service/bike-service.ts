@@ -1,6 +1,6 @@
-import { CreateBikeData } from "../../dtos/bike.dto";
+import { CreateBikeData, FilterQuery } from "../../dtos/bike.dto";
 import { Bike } from "../../entities/bike.entity";
-import { getBikeOnBasisOfRole } from "../../utils/CommonFunction";
+import { filterBikesByQuery, getBikeOnBasisOfRole } from "../../utils/CommonFunction";
 import { ErrorHandler } from "../../utils/ErrorHandler";
 
 export class BikeService {
@@ -13,9 +13,11 @@ export class BikeService {
         await bike.save();
         return { success: true };
     }
-    async getAllBikes(biketoken: string) {
-        const allBikes = await getBikeOnBasisOfRole(biketoken);
 
+    async getAllBikes(biketoken: string, filterQuery: FilterQuery) {
+        const allBikes = await getBikeOnBasisOfRole(biketoken);
+        console.log(filterQuery);
+        const queryFilteredBikes = await filterBikesByQuery(allBikes, filterQuery);
 
         return { success: true, bikes: allBikes }
     }
@@ -35,6 +37,7 @@ export class BikeService {
         }
         throw new ErrorHandler("Unable to update or Bike not Found", 400);
     }
+    
     async deleteBike(id: string) {
         const bike: Bike | null = await Bike.findOne({ where: { id: id } });
         if (bike) {

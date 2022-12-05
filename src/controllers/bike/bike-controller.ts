@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { Inject } from "typescript-ioc";
-import { CreateBikeData } from "../../dtos/bike.dto";
+import { CreateBikeData, FilterQuery } from "../../dtos/bike.dto";
 import { BikeService } from "../../service";
 
 
@@ -25,7 +25,7 @@ export class BikeController {
     public async getBikes(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
-            const getBikesResponse = await this.bikeService.getAllBikes(req.cookies.biketoken as string);
+            const getBikesResponse = await this.bikeService.getAllBikes(req.cookies.biketoken as string, req.query as any);
             res.status(201).json({ ...getBikesResponse, message: "Bike Fetched succesfully" })
 
         } catch (error) {
