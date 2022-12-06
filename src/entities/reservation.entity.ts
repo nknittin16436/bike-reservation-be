@@ -38,7 +38,4 @@ export class Reservation extends BaseEntity {
 
     @ManyToOne(() => Bike, (bike) => bike.reservations, { nullable: true, onDelete: 'CASCADE' })
     bike: Bike
-
-    @JoinTable()
-    users: User[]
 }

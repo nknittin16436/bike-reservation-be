@@ -12,9 +12,10 @@ export class ReservationController {
     public async createReservation(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const createBikeResponse = await this.reservationService.createReservation(req.body as createReservationData);
-            res.status(201).json({ createBikeResponse, message: "Bike created succesfully" })
-        } catch (error) {
-            res.status(400).json({ success: false, message: "Unable to add bike" })
+            res.status(201).json({ ...createBikeResponse, message: "Bike created succesfully" })
+        } catch (error: any) {
+            console.log(error)
+            res.status(400).json({ success: false, message: error.message })
         }
     }
 }

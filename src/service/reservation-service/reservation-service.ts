@@ -1,11 +1,43 @@
 import { createReservationData } from "../../dtos/reservation.dto";
 import { Reservation } from "../../entities/reservation.entity";
 import { ErrorHandler } from "../../utils/ErrorHandler";
-
+import { getLoggedInUser, isReservationAvailable, validateReservationDate } from '../../utils/CommonFunction'
+import { Bike } from "../../entities/bike.entity";
 
 export class ReservationService {
     async createReservation(reservationData: createReservationData) {
-        return true;
+        const bike = await Bike.findOne({
+            relations: {
+                reservations: true,
+            }, where: { id: reservationData.bikeId }
+        });
+        if (!bike) {
+            throw new ErrorHandler('Invalid Bike Id', 400);
+        }
+        const user = await getLoggedInUser(reservationData.userId);
+        if (!user) {
+            throw new ErrorHandler('Invalid User', 400);
+        }
+
+
+        validateReservationDate(reservationData.fromDate, reservationData.toDate)
+        if (isReservationAvailable(bike, reservationData.fromDate, reservationData.toDate)) {
+            if (bike.isAvailable) {
+                const reservation = new Reservation();
+                reservation.bikeName = bike.name;
+                reservation.bikeId = reservationData.bikeId;
+                reservation.fromDate = reservationData.fromDate;
+                reservation.toDate = reservationData.toDate;
+                reservation.userId = user.id;
+                reservation.userName = user.name;
+                await reservation.save();
+            }
+
+        }
+
+
+
+        return { success: true };
     }
     async getAllReservations() {
         const reservations = await Reservation.find();

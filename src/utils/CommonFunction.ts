@@ -5,6 +5,7 @@ import * as jwt from 'jsonwebtoken';
 import { FilterQuery } from "../dtos/bike.dto";
 import moment from 'moment';
 import { ErrorHandler } from "./ErrorHandler";
+import { Reservation } from "../entities/reservation.entity";
 
 
 export const cookieOptions = {
@@ -25,6 +26,7 @@ export const getLoggedInUser = async (biketoken: string): Promise<User | null> =
     const user: User | null = await User.findOne({ where: { id: decodedData.id } });
     return user;
 }
+
 
 export const getBikeOnBasisOfRole = async (biketoken: string): Promise<Bike[]> => {
     const user: User | null = await getLoggedInUser(biketoken);
@@ -83,4 +85,52 @@ export const filterBikesByQuery = async (bikes: Bike[], query: FilterQuery): Pro
     }
     return filteredBikes;
 
+}
+
+export const validateReservationDate = (fromDate: string, toDate: string) => {
+    if (!fromDate || !toDate) {
+        throw new ErrorHandler('Enter valid from and to date', 400);
+    }
+    if (fromDate < moment(Date.now()).format('YYYY-MM-DD H:mm:ss')) {
+        throw new ErrorHandler('Start date should be greater then current date', 400);
+    }
+    if (fromDate > toDate) {
+        throw new ErrorHandler('From date cannot be greater than to date', 400);
+    }
+    if (fromDate === toDate) {
+        throw new ErrorHandler('From date and To date cannot be same', 400);
+    }
+}
+
+export const isReservationAvailable = (bike: Bike, fromDate: string, toDate: string) => {
+    let reservations: Reservation[] = bike.reservations;
+    if (reservations.length === 0) {
+        return true;
+    }
+    // console.log(bike, reservations)
+    reservations = reservations.filter(reservation => reservation.status === true)
+    if (reservations.length === 0) {
+        return true;
+    }
+
+    let trueCount = 0;
+    for (const reservation of reservations) {
+
+        if (fromDate < reservation.fromDate && toDate < reservation.fromDate) {
+            // console.log("1");
+            trueCount++;
+        }
+        if ((fromDate > reservation.fromDate) && (fromDate > reservation.toDate)) {
+            // console.log("2", fromDate, reservation);
+            trueCount++;
+        }
+
+    }
+    if (trueCount === reservations.length) {
+        return true;
+    }
+
+    else {
+        throw new ErrorHandler('Bike cannot be booked on given duration', 400);
+    }
 }
