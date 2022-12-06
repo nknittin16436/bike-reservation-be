@@ -48,9 +48,10 @@ export class BikeController {
     public async deleteBike(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
-            const createBikeResponse = await this.bikeService.deleteBike(req.params.id as string);
-        } catch (error) {
-
+            const deleteBikeResponse = await this.bikeService.deleteBike(req.params.id as string);
+            res.status(200).json({ ...deleteBikeResponse, message: "Bike deleted succesfully" })
+        } catch (error: any) {
+            res.status(400).json({ success: false, message: error.message })
         }
     }
 }
