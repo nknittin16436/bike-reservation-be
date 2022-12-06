@@ -34,9 +34,6 @@ export class ReservationService {
             }
 
         }
-
-
-
         return { success: true };
     }
     async getAllReservations() {
@@ -50,6 +47,7 @@ export class ReservationService {
 
     }
     async getBikeReservations(bikeId: string) {
+        console.log(bikeId)
         const reservations = await Reservation.find({ where: { bikeId: bikeId } });
         return { reservations, success: true }
     }
