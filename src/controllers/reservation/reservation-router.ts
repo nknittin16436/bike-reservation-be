@@ -19,6 +19,15 @@ router.get('/reservations/bike/:bikeId', (req, res, next) => {
 router.get('/reservations/user/:userId', (req, res, next) => {
     reservationController.getAllUsersReservations(req, res, next);
 })
+router.post('/reservations/:id', (req, res, next) => {
+    reservationController.updateReservationRating(req, res, next);
+})
+router.patch('/reservations/:id', (req, res, next) => {
+    reservationController.updateReservationStatus(req, res, next);
+})
+router.delete('/reservations/:id', (req, res, next) => {
+    reservationController.deleteReservation(req, res, next);
+})
 
 
 export { router as reservationRouter };

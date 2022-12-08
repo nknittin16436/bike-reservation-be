@@ -75,7 +75,17 @@ export class UserController {
             res.status(200).json({ ...deleteRes, message: "User updated successfully" });
         } catch (error: any) {
             console.log(error);
-            res.status(error.statusCode).json({ message: error.message })
+            res.status(400).json({ message: error.message })
+        }
+    }
+
+    public async getSingleUser(req: express.Request, res: express.Response, next: NextFunction): Promise<void> {
+        try {
+            const userRes: SuccessResponse = await this.userService.getSingleUser(req.params.id as string);
+            res.status(200).json({ ...userRes, message: "User updated successfully" });
+        } catch (error: any) {
+            console.log(error);
+            res.status(400).json({ message: error.message })
         }
     }
 }

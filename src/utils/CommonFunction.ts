@@ -50,21 +50,21 @@ export const getBikeOnBasisOfRole = async (biketoken: string): Promise<Bike[]> =
 
 
 export const filterBikesByQuery = async (bikes: Bike[], query: FilterQuery): Promise<Bike[]> => {
-    let filteredBikes: Bike[] = [];
-    if (query && query.rating) {
+    let filteredBikes: Bike[] = bikes;
+    if (query.rating) {
 
-        bikes = bikes.filter(bike => bike.averageRating >= query.rating);
+        filteredBikes = filteredBikes.filter(bike => bike.averageRating >= query.rating);
     }
-    if (query && query.name) {
-        bikes = bikes.filter(bike => bike.name.toLowerCase().includes(query.name.toLowerCase()));
+    if (query.name) {
+        filteredBikes = filteredBikes.filter(bike => bike.name.toLowerCase().includes(query.name.toLowerCase()));
     }
     if (query.color) {
 
-        bikes = bikes.filter(bike => bike.color.toLowerCase().includes(query.color.toLowerCase()));
+        filteredBikes = filteredBikes.filter(bike => bike.color.toLowerCase().includes(query.color.toLowerCase()));
     }
     if (query.location) {
 
-        bikes = bikes.filter(bike => bike.location.toLowerCase().includes(query.location.toLowerCase()));
+        filteredBikes = filteredBikes.filter(bike => bike.location.toLowerCase().includes(query.location.toLowerCase()));
     }
     if (query.fromDate || query.toDate) {
         if (!query.fromDate || !moment(query.fromDate, 'YYYY-MM-DD H:mm:ss').isValid()) {
@@ -82,6 +82,30 @@ export const filterBikesByQuery = async (bikes: Bike[], query: FilterQuery): Pro
         if (query.fromDate > query.toDate) {
             throw new ErrorHandler('From date cannot be greater than to date', 400);
         }
+    }
+    if (query.fromDate && query.toDate) {
+        filteredBikes = filteredBikes.filter((bike) => {
+            let reservations = bike.reservations;
+            // console.log(bike.name, reservations)
+            reservations = reservations.filter(reservation => reservation.status === true)
+            if (reservations.length === 0) {
+                return true;
+            }
+            let trueCount = 0;
+            for (const reservation of reservations) {
+
+                if (query.fromDate < reservation.fromDate && query.toDate < reservation.fromDate) {
+                    trueCount++;
+                }
+                if ((query.fromDate > reservation.fromDate) && (query.fromDate > reservation.toDate)) {
+                    trueCount++;
+                }
+
+            }
+            if (trueCount === reservations.length) {
+                return true;
+            }
+        });
     }
     return filteredBikes;
 
@@ -129,7 +153,6 @@ export const isReservationAvailable = (bike: Bike, fromDate: string, toDate: str
     if (trueCount === reservations.length) {
         return true;
     }
-
     else {
         throw new ErrorHandler('Bike cannot be booked on given duration', 400);
     }

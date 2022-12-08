@@ -1,3 +1,5 @@
+import { Bike } from "../entities/bike.entity";
+
 export interface CreateBikeData {
     name: string;
     color: string;
@@ -13,4 +15,8 @@ export interface FilterQuery {
     fromDate: string;
     toDate: string;
     page: number;
+}
+export interface SuccessResponseBikes {
+    success: boolean;
+    bikes?: Bike[];
 }

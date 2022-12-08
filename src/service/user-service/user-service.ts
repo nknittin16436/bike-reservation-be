@@ -1,4 +1,4 @@
-import { JwtPayload, LoginUser, RegisterUser, SuccessResponse, UpdateUserData } from "../../dtos/user.dto";
+import { JwtPayload, LoginResponse, LoginUser, RegisterUser, SuccessResponse, UpdateUserData } from "../../dtos/user.dto";
 import { User } from "../../entities/user.entity";
 import { ErrorHandler } from "../../utils/ErrorHandler";
 import * as bcrypt from 'bcryptjs';
@@ -7,7 +7,7 @@ import * as jwt from 'jsonwebtoken';
 import { getLoggedInUser, isUserRegistered } from "../../utils/CommonFunction";
 
 export class UserService {
-    async registerUser(userData: RegisterUser): Promise<any> {
+    async registerUser(userData: RegisterUser): Promise<SuccessResponse> {
         const { name, email, password }: RegisterUser = userData;
         if (await isUserRegistered(email)) {
             throw new ErrorHandler("This Email already Exist", 400);
@@ -18,11 +18,10 @@ export class UserService {
         const hashedPassword: string = bcrypt.hashSync(password, 10);
         user.password = hashedPassword;
         await user.save();
-
         return { success: true };
     }
 
-    async loginUser(userData: LoginUser): Promise<any> {
+    async loginUser(userData: LoginUser): Promise<LoginResponse> {
 
         const { email, password }: LoginUser = userData;
         const user: User | null = await isUserRegistered(email);
@@ -38,7 +37,7 @@ export class UserService {
             throw new ErrorHandler("No user found with this Email Id", 400);
         }
     }
-    async getAllUsers(): Promise<any> {
+    async getAllUsers(): Promise<SuccessResponse> {
         const users: User[] = await User.find({
             relations: {
                 reservations: true,
@@ -47,7 +46,7 @@ export class UserService {
         return { users, success: true };
     }
 
-    async getUser(biketoken: string): Promise<any> {
+    async getUser(biketoken: string): Promise<SuccessResponse> {
         const user: User | null = await getLoggedInUser(biketoken);
         if (user) {
             return { user, success: true };
@@ -57,7 +56,7 @@ export class UserService {
     }
 
 
-    async deleteUser(id: string): Promise<any> {
+    async deleteUser(id: string): Promise<SuccessResponse> {
         const user: User | null = await User.findOne({ where: { id: id } });
         if (user) {
             await User.delete(id);
@@ -66,7 +65,7 @@ export class UserService {
         throw new ErrorHandler("Unable to delete or User not Found", 400);
     }
 
-    async updateUser(id: string, updateUserData: UpdateUserData): Promise<any> {
+    async updateUser(id: string, updateUserData: UpdateUserData): Promise<SuccessResponse> {
         const user: User | null = await User.findOne({ where: { id: id } });
         if (user) {
             if (Object.keys(updateUserData).length !== 0) {
@@ -77,5 +76,19 @@ export class UserService {
             return { success: true }
         }
         throw new ErrorHandler("Unable to update or User not Found", 400);
+    }
+
+    async getSingleUser(id: string): Promise<SuccessResponse> {
+        const user: User | null = await User.findOne({
+            relations: {
+                reservations: true,
+            }, where: { id: id }
+        });
+        if (user) {
+            return { user, success: true };
+        }
+        else {
+            throw new ErrorHandler("No user found with this id", 400);
+        }
     }
 }

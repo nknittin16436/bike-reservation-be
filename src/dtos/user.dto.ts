@@ -21,7 +21,8 @@ export interface UpdateUserData {
 
 export interface SuccessResponse {
     success: boolean;
-    users?: User[]
+    users?: User[];
+    user?: User;
 }
 export interface LoginResponse {
     user: User;

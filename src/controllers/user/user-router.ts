@@ -28,7 +28,8 @@ router.get("/user/me", (req, res, next) => {
 router.patch("/user/:id", (req, res, next) => {
     userController.updateUser(req, res, next);
 });
+router.get("/user/:id", (req, res, next) => {
+    userController.getSingleUser(req, res, next);
+})
 
-// router.route("/register").post(userController.registerUser);
-// router.route("/login").post(userController.loginUser);
 export { router as userRouter };
